@@ -85,8 +85,10 @@ try {
   await getLimits('big_uploads')
 } catch(e) {
   console.warn('---')
-  console.warn('it seems as though there is an issue with authentication, try re-entering your cookie!')
-  console.warn('disabling cookie...')
+  console.warn()
+  console.warn('There was an issue trying to authenticate your Nekoweb cookie, try generating another cookie.')
+  console.warn('Skipping cookie-related endpoints...')
+  console.warn()
   console.warn('---')
   NEKOWEB_COOKIE = undefined
 }
@@ -184,8 +186,19 @@ const finalizeUpload = async (uploadId: string) => {
   await genericRequest("/files/edit", {
     method: "POST",
     data: {
-      pathname: "/index.html",
-      content: `<!-- ${Date.now()} -->`,
+      pathname: "/deploy2nekoweb.html",
+      content: 
+        `<!--
+        This is an auto-generated file created by deploy2nekoweb.
+        
+        This file is used to put you on the 'Last Updated' page
+        on Nekoweb.
+
+        You can delete this file if you want, but it will come
+        back the next time you deploy using deploy2nekoweb.
+        
+        Timestamp: ${Date.now()}
+        -->`,
       csrf: csrfToken,
       site: username,
     },
