@@ -189,16 +189,17 @@ const finalizeUpload = async (uploadId: string) => {
       pathname: "/deploy2nekoweb.html",
       content: 
         `<!--
-        This is an auto-generated file created by deploy2nekoweb.
+This is an auto-generated file created by deploy2nekoweb.
         
-        This file is used to put you on the 'Last Updated' page
-        on Nekoweb.
+This file is used to put you on the 'Last Updated' page
+on Nekoweb.
 
-        You can delete this file if you want, but it will come
-        back the next time you deploy using deploy2nekoweb.
-        
-        Timestamp: ${Date.now()}
-        -->`,
+You can delete this file if you want, but it will come
+back the next time you deploy using deploy2nekoweb.
+
+               https://deploy.nekoweb.org
+-->
+<!-- ${Date.now()} -->`,
       csrf: csrfToken,
       site: username,
     },
