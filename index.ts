@@ -2,7 +2,6 @@ import fs from "fs/promises";
 import FormData from "form-data";
 import path from "path";
 import { zip } from "zip-a-folder";
-import axios from "axios";
 import NekoAPI from '@indiefellas/nekoweb-api';
 import { version } from './package.json'
 import { LogType } from "@indiefellas/nekoweb-api/types";

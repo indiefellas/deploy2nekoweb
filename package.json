@@ -11,7 +11,6 @@
   },
   "dependencies": {
     "@indiefellas/nekoweb-api": "^2.1.0",
-    "axios": "^1.7.5",
     "form-data": "^4.0.0",
     "zip-a-folder": "^3.1.7"
   }
