@@ -6,7 +6,6 @@ import NekoAPI from '@indiefellas/nekoweb-api';
 import { version } from './package.json'
 import { LogType } from "@indiefellas/nekoweb-api/types";
 
-const API_URL = "https://nekoweb.org/api";
 let {
   D2N_NW_API_KEY,
   D2N_NW_DOMAIN,
@@ -149,8 +148,6 @@ const uploadToNekoweb = async () => {
 
   await refreshLimits()
 
-  if (bigUploadLimits.remaining < 1) await sleepUntil(bigUploadLimits.reset);
-  if (zipLimits.remaining < 1) await sleepUntil(zipLimits.reset);
   if (generalLimits.remaining < 1) await sleepUntil(generalLimits.reset);
 
   await neko.delete(D2N_NW_DOMAIN!)
