@@ -12,9 +12,12 @@ inputs:
   nekoweb-cookie:
     description: 'Your nekoweb cookie. (Required for Recently Updated feature)'
     required: false
-  nekoweb-folder:
-    description: 'The nekoweb folder to deploy to.'
+  nekoweb-domain:
+    description: 'The nekoweb domain to deploy to.'
     required: true
+  nekoweb-username:
+    description: 'Your Nekoweb username. (Required for Recently Updated feature)'
+    required: false
   directory:
     description: 'The directory you would like to deploy.'
     required: true
@@ -36,11 +39,16 @@ runs:
         cd ../
 
         if [ -n "${{ inputs.nekoweb-cookie }}" ]; then
-          export NEKOWEB_COOKIE="${{ inputs.nekoweb-cookie }}"
+          export D2N_NW_COOKIE="${{ inputs.nekoweb-cookie }}"
         fi
-        export NEKOWEB_API_KEY="${{ inputs.nekoweb-api-key }}"
-        export NEKOWEB_FOLDER="${{ inputs.nekoweb-folder }}"
-        export DIRECTORY="${{ inputs.directory }}"
+
+        if [ -n "${{ inputs.nekoweb-username }}" ]; then
+          export D2N_NW_COOKIE="${{ inputs.nekoweb-username }}"
+        fi
+
+        export D2N_NW_API_KEY="${{ inputs.nekoweb-api-key }}"
+        export D2N_NW_DOMAIN="${{ inputs.nekoweb-domain }}"
+        export D2N_DIRECTORY="${{ inputs.directory }}"
         
         bun run ./deploy2nekoweb/index.ts
       shell: bash

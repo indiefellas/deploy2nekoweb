@@ -1,7 +1,8 @@
 {
-  "name": "deploy-to-nekoweb",
+  "name": "deploy2nekoweb",
   "module": "index.js",
   "type": "module",
+  "version": "1.0.0",
   "devDependencies": {
     "@types/bun": "^1.1.6"
   },
@@ -9,8 +10,9 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "@indiefellas/nekoweb-api": "^2.1.0",
+    "axios": "^1.7.5",
     "form-data": "^4.0.0",
-    "zip-a-folder": "^3.1.7",
-    "axios": "^1.7.5"
+    "zip-a-folder": "^3.1.7"
   }
 }
