@@ -81,19 +81,6 @@ const refreshLimits = async () => {
   zipLimits = limits.zip
 }
 
-const genericRequest = async (url: string, options: any): Promise<any> => {
-  try {
-    const response = await axios({
-      url: API_URL + url,
-      ...options,
-    });
-    return response.data;
-  } catch (error: any) {
-    console.error(`Failed to fetch ${url}\n${error.message}`);
-    throw error;
-  }
-};
-
 const sleepUntil = (time: number) => {
   const now = Date.now();
   if (now >= time) return;
@@ -108,29 +95,15 @@ const zipDirectory = async (name: string) => {
   return zipPath;
 };
 
-const getCSRFToken = async () => {
-  const res = await genericRequest("/csrf", {
-    method: "GET",
-    headers: {
-      Origin: "https://nekoweb.org",
-      Host: "nekoweb.org",
-      "User-Agent": "deploy2nekoweb build script (please don't ban us)",
-      Referer: `https://nekoweb.org/?${encodeURIComponent(
-        "deploy2nekoweb build script (please dont ban us)"
-      )}`,
-      Cookie: `token=${D2N_NW_COOKIE}`,
-    },
-  });
-
-  return res;
-};
+const getCSRFToken = async () => await neko.generic("/csrf", { method: "GET" });
 
 const finalizeUpload = async () => {
   if (D2N_NW_COOKIE == null) return;
 
-  const data = new FormData()
-  data.append('pathname', `/${D2N_NW_DOMAIN}/deploy2nekoweb.html`)
-  data.append('content', `<!--
+  try {
+    const data = new FormData()
+    data.append('pathname', `/${D2N_NW_DOMAIN}/deploy2nekoweb.html`)
+    data.append('content', `<!--
 This is an auto-generated file created by deploy2nekoweb.
         
 This file is used to put you on the 'Last Updated' page
@@ -142,14 +115,17 @@ back the next time you deploy using deploy2nekoweb.
                https://deploy.nekoweb.org
 -->
 <!-- ${Date.now()} -->`)
-  data.append('site', D2N_NW_USERNAME)
-  data.append('csrf', await getCSRFToken())
+    data.append('site', D2N_NW_USERNAME)
+    data.append('csrf', await getCSRFToken())
 
-  await neko.generic('/files/edit', {
-    method: 'POST',
-    data
-  })
-  console.log("Sent cookie request.");
+    await neko.generic('/files/edit', {
+      method: 'POST',
+      data
+    })
+    console.log("Sent cookie request.");
+  } catch (e) {
+    console.error('Failed to send cookie request.')
+  }
 };
 
 const cleanUp = async (zipPath: string) => {
