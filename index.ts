@@ -61,6 +61,7 @@ await neko.getFileLimits()
     console.warn('Skipping cookie-related endpoints...')
     console.warn()
     console.warn('---')
+    D2N_NW_COOKIE = undefined
     neko = new NekoAPI({
       apiKey: D2N_NW_API_KEY!,
       appName: `deploy2nekoweb/${version} (https://github.com/indiefellas/deploy2nekoweb)`,
