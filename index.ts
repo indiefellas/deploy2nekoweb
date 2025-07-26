@@ -135,22 +135,18 @@ const cleanUp = async (zipPath: string) => {
 const uploadToNekoweb = async () => {
   console.log("Uploading files to Nekoweb...");
 
+  await refreshLimits()
   if (bigUploadLimits.remaining < 1) await sleepUntil(bigUploadLimits.reset);
+  if (generalLimits.remaining < 1) await sleepUntil(generalLimits.reset);
+
+  await neko.delete(D2N_NW_DOMAIN!)
 
   const zipPath = await zipDirectory('build');
-  console.log(zipPath);
-
   const fileBuffer = await fs.readFile(zipPath);
 
   const file = await neko.createBigFile()
   await file.append(fileBuffer);
   await file.import()
-
-  await refreshLimits()
-
-  if (generalLimits.remaining < 1) await sleepUntil(generalLimits.reset);
-
-  await neko.delete(D2N_NW_DOMAIN!)
 
   await finalizeUpload();
   await cleanUp(zipPath);
