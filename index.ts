@@ -5,6 +5,7 @@ import { zip } from "zip-a-folder";
 import axios from "axios";
 import NekoAPI from '@indiefellas/nekoweb-api';
 import { version } from './package.json'
+import { LogType } from "@indiefellas/nekoweb-api/types";
 
 const API_URL = "https://nekoweb.org/api";
 let {
@@ -20,21 +21,36 @@ Object.entries({ D2N_NW_API_KEY, D2N_NW_DOMAIN, D2N_DIRECTORY }).forEach(x => {
   if (x[1] == null) throw new Error(`Environment variable for ${x[0]} cannot be null.`)
 })
 
+const logging = (type: LogType, msg: string) => {
+  switch (type) {
+    case LogType.Info: 
+      console.log(msg);
+      break;
+    case LogType.Warn:
+      console.warn(msg);
+      break;
+    case LogType.Error:
+      console.error(msg);
+      break;
+  }
+}
+
 let neko = new NekoAPI({
-    apiKey: D2N_NW_API_KEY!,
-    appName: `deploy2nekoweb/${version} (https://github.com/indiefellas/deploy2nekoweb)`,
-    request: D2N_NW_COOKIE != null ? {
-      headers: {
-        Authorization: '',
-        Origin: 'https://nekoweb.org',
-        Host: 'nekoweb.org',
-        'User-Agent': ``,
-        Referer: `https://nekoweb.org/?${encodeURIComponent(
-          'deploy2nekoweb build script (please dont ban us)'
-        )}`,
-        Cookie: `token=${D2N_NW_COOKIE}`,
-      }
-    } : {}
+  apiKey: D2N_NW_API_KEY!,
+  appName: `deploy2nekoweb/${version} (https://github.com/indiefellas/deploy2nekoweb)`,
+  logging,
+  request: D2N_NW_COOKIE != null ? {
+    headers: {
+      Authorization: '',
+      Origin: 'https://nekoweb.org',
+      Host: 'nekoweb.org',
+      'User-Agent': ``,
+      Referer: `https://nekoweb.org/?${encodeURIComponent(
+        'deploy2nekoweb build script (please dont ban us)'
+      )}`,
+      Cookie: `token=${D2N_NW_COOKIE}`,
+    }
+  } : {}
 });
 
 await neko.getFileLimits()
@@ -48,6 +64,7 @@ await neko.getFileLimits()
     neko = new NekoAPI({
       apiKey: D2N_NW_API_KEY!,
       appName: `deploy2nekoweb/${version} (https://github.com/indiefellas/deploy2nekoweb)`,
+      logging,
       request: {}
     })
   })
