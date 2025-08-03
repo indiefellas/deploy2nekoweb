@@ -66,8 +66,6 @@ if (D2N_NW_COOKIE != null) {
 
 await neko.getFileLimits()
   .catch(x => {
-    console.error(x)
-    
     console.warn('---')
     console.warn()
     console.warn('There was an issue trying to authenticate your Nekoweb cookie, try generating another cookie.')
