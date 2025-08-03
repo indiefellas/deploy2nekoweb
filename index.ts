@@ -33,27 +33,41 @@ const logging = (type: LogType, msg: string) => {
   }
 }
 
-let neko = new NekoAPI({
-  apiKey: '',
-  appName: `deploy2nekoweb/${version} (https://github.com/indiefellas/deploy2nekoweb)`,
-  logging,
-  request: D2N_NW_COOKIE != null ? {
-    headers: {
-      Authorization: '',
-      Origin: 'https://nekoweb.org',
-      Host: 'nekoweb.org',
-      'User-Agent': ``,
-      Referer: `https://nekoweb.org/?${encodeURIComponent(
-        'deploy2nekoweb build script (please dont ban us)'
-      )}`,
-      Cookie: `token=${D2N_NW_COOKIE}`,
+const createNormalAPI = () =>
+  new NekoAPI({
+    apiKey: D2N_NW_API_KEY!,
+    appName: `deploy2nekoweb/${version} (https://github.com/indiefellas/deploy2nekoweb)`,
+    logging,
+    request: {}
+  })
+
+let neko;
+if (D2N_NW_COOKIE != null) {
+  neko = new NekoAPI({
+    apiKey: '',
+    appName: `deploy2nekoweb/${version} (https://github.com/indiefellas/deploy2nekoweb)`,
+    logging,
+    request: {
+      headers: {
+        Authorization: '',
+        Origin: 'https://nekoweb.org',
+        Host: 'nekoweb.org',
+        'User-Agent': ``,
+        Referer: `https://nekoweb.org/?${encodeURIComponent(
+          'deploy2nekoweb build script (please dont ban us)'
+        )}`,
+        Cookie: `token=${D2N_NW_COOKIE}`,
+      }
     }
-  } : {}
-});
+  });
+} else {
+  neko = createNormalAPI()
+}
 
 await neko.getFileLimits()
   .catch(x => {
-    console.warn(x)
+    console.error(x)
+    
     console.warn('---')
     console.warn()
     console.warn('There was an issue trying to authenticate your Nekoweb cookie, try generating another cookie.')
@@ -61,12 +75,7 @@ await neko.getFileLimits()
     console.warn()
     console.warn('---')
     D2N_NW_COOKIE = undefined
-    neko = new NekoAPI({
-      apiKey: D2N_NW_API_KEY!,
-      appName: `deploy2nekoweb/${version} (https://github.com/indiefellas/deploy2nekoweb)`,
-      logging,
-      request: {}
-    })
+    neko = createNormalAPI()
   })
 
 let limits = await neko.getFileLimits()
