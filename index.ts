@@ -53,6 +53,7 @@ let neko = new NekoAPI({
 
 await neko.getFileLimits()
   .catch(x => {
+    console.warn(x)
     console.warn('---')
     console.warn()
     console.warn('There was an issue trying to authenticate your Nekoweb cookie, try generating another cookie.')
