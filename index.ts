@@ -15,8 +15,6 @@ let {
 } = process.env;
 if (D2N_NW_USERNAME == null) D2N_NW_USERNAME = ''
 
-console.log('cookie', D2N_NW_COOKIE)
-
 Object.entries({ D2N_NW_API_KEY, D2N_NW_DOMAIN, D2N_DIRECTORY }).forEach(x => {
   if (x[1] == null) throw new Error(`Environment variable for ${x[0]} cannot be null.`)
 })
