@@ -34,7 +34,7 @@ const logging = (type: LogType, msg: string) => {
 }
 
 let neko = new NekoAPI({
-  apiKey: D2N_NW_API_KEY!,
+  apiKey: '',
   appName: `deploy2nekoweb/${version} (https://github.com/indiefellas/deploy2nekoweb)`,
   logging,
   request: D2N_NW_COOKIE != null ? {
