@@ -1,5 +1,4 @@
 import fs from "fs/promises";
-import FormData from "form-data";
 import path from "path";
 import { zip } from "zip-a-folder";
 import NekoAPI from '@indiefellas/nekoweb-api';
@@ -10,7 +9,6 @@ let {
   D2N_NW_API_KEY,
   D2N_NW_DOMAIN,
   D2N_NW_USERNAME,
-  D2N_NW_COOKIE,
   D2N_DIRECTORY,
 } = process.env;
 if (D2N_NW_USERNAME == null) D2N_NW_USERNAME = ''
@@ -33,48 +31,12 @@ const logging = (type: LogType, msg: string) => {
   }
 }
 
-const createNormalAPI = () =>
-  new NekoAPI({
-    apiKey: D2N_NW_API_KEY!,
-    appName: `deploy2nekoweb/${version} (https://github.com/indiefellas/deploy2nekoweb)`,
-    logging,
-    request: {}
-  })
-
-let neko;
-if (D2N_NW_COOKIE != null) {
-  neko = new NekoAPI({
-    apiKey: '',
-    appName: `deploy2nekoweb/${version} (https://github.com/indiefellas/deploy2nekoweb)`,
-    logging,
-    request: {
-      headers: {
-        Authorization: '',
-        Origin: 'https://nekoweb.org',
-        Host: 'nekoweb.org',
-        'User-Agent': ``,
-        Referer: `https://nekoweb.org/?${encodeURIComponent(
-          'deploy2nekoweb build script (please dont ban us)'
-        )}`,
-        Cookie: `token=${D2N_NW_COOKIE}`,
-      }
-    }
-  });
-} else {
-  neko = createNormalAPI()
-}
-
-await neko.getFileLimits()
-  .catch(x => {
-    console.warn('---')
-    console.warn()
-    console.warn('There was an issue trying to authenticate your Nekoweb cookie, try generating another cookie.')
-    console.warn('Skipping cookie-related endpoints...')
-    console.warn()
-    console.warn('---')
-    D2N_NW_COOKIE = undefined
-    neko = createNormalAPI()
-  })
+const neko = new NekoAPI({
+  apiKey: D2N_NW_API_KEY!,
+  appName: `deploy2nekoweb/${version} (https://github.com/indiefellas/deploy2nekoweb)`,
+  logging,
+  request: {}
+}) 
 
 let limits = await neko.getFileLimits()
 let bigUploadLimits = limits.big_uploads
@@ -102,39 +64,6 @@ const zipDirectory = async (name: string) => {
   return zipPath;
 };
 
-const getCSRFToken = async () => await neko.generic("/csrf", { method: "GET" });
-
-const finalizeUpload = async () => {
-  if (D2N_NW_COOKIE == null) return;
-
-  try {
-    const data = new FormData()
-    data.append('pathname', `/${D2N_NW_DOMAIN}/deploy2nekoweb.html`)
-    data.append('content', `<!--
-This is an auto-generated file created by deploy2nekoweb.
-        
-This file is used to put you on the 'Last Updated' page
-on Nekoweb.
-
-You can delete this file if you want, but it will come
-back the next time you deploy using deploy2nekoweb.
-
-               https://deploy.nekoweb.org
--->
-<!-- ${Date.now()} -->`)
-    data.append('site', D2N_NW_USERNAME)
-    data.append('csrf', await getCSRFToken())
-
-    await neko.generic('/files/edit', {
-      method: 'POST',
-      data
-    })
-    console.log("Sent cookie request.");
-  } catch (e) {
-    console.error('Failed to send cookie request.')
-  }
-};
-
 const cleanUp = async (zipPath: string) => {
   await fs.rm(zipPath);
   console.log("Upload completed and cleaned up.");
@@ -147,9 +76,8 @@ const uploadToNekoweb = async () => {
   if (bigUploadLimits.remaining < 1) await sleepUntil(bigUploadLimits.reset);
   if (generalLimits.remaining < 1) await sleepUntil(generalLimits.reset);
 
-  try {
-    await neko.delete(D2N_NW_DOMAIN!)
-  } catch(e) {}
+  await neko.delete(D2N_NW_DOMAIN!)
+    .catch(_ => null)
 
   const zipPath = await zipDirectory('build');
   const fileBuffer = await fs.readFile(zipPath);
@@ -158,7 +86,6 @@ const uploadToNekoweb = async () => {
   await file.append(fileBuffer);
   await file.import()
 
-  await finalizeUpload();
   await cleanUp(zipPath);
 };
 

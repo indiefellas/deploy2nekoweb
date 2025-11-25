@@ -9,9 +9,6 @@ inputs:
   nekoweb-api-key:
     description: 'Your nekoweb API key.'
     required: true
-  nekoweb-cookie:
-    description: 'Your nekoweb cookie. (Required for Recently Updated feature)'
-    required: false
   nekoweb-domain:
     description: 'The nekoweb domain to deploy to.'
     required: true
@@ -37,10 +34,6 @@ runs:
         cd deploy2nekoweb
         bun install
         cd ../
-
-        if [ -n "${{ inputs.nekoweb-cookie }}" ]; then
-          export D2N_NW_COOKIE="${{ inputs.nekoweb-cookie }}"
-        fi
 
         if [ -n "${{ inputs.nekoweb-username }}" ]; then
           export D2N_NW_USERNAME="${{ inputs.nekoweb-username }}"
